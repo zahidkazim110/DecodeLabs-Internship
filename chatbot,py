@@ -1,0 +1,254 @@
+from tkinter import *
+from datetime import datetime
+
+# ==========================
+# COLORS (Professional Theme)
+# ==========================
+
+BG = "#F7F7F8"
+HEADER = "#202123"
+USER_BUBBLE = "#2563EB"      # Blue
+BOT_BUBBLE = "#F3F4F6"       # Soft Gray
+USER_TEXT = "#FFFFFF"
+BOT_TEXT = "#111827"
+
+# ==========================
+# KNOWLEDGE BASE
+# ==========================
+
+responses = {
+    "hello": "👋 Hello! How can I help you today?",
+    "hi": "😊 Hi there!",
+    "hey": "🙌 Hey! Welcome to SmartBot.",
+    "how are you": "😄 I'm doing great. How about you?",
+    "what is your name": "🤖 My name is SmartBot AI.",
+    "who are you": "🤖 I am a Rule-Based AI Chatbot.",
+    "who created you": "👨‍💻 Created for DecodeLabs AI Internship.",
+    "tell me a joke": "😂 Why do programmers prefer dark mode? Because light attracts bugs!",
+    "tell me another joke": "🤣 Why was the computer cold? Because it left its Windows open!",
+    "motivate me": "💪 Success is the sum of small efforts repeated every day.",
+    "thank you": "😊 You're welcome!",
+    "thanks": "😎 Happy to help!",
+    "python": "🐍 Python is one of the most popular programming languages.",
+    "ai": "🧠 Artificial Intelligence enables machines to mimic human intelligence.",
+    "machine learning": "📊 Machine Learning is a branch of AI that learns from data."
+}
+
+# ==========================
+# CHATBOT RESPONSE
+# ==========================
+
+def get_response(msg):
+
+    msg = msg.lower().strip()
+
+    if msg == "date":
+        return f"📅 Today's Date: {datetime.now().strftime('%d-%m-%Y')}"
+
+    if msg == "time":
+        return f"⏰ Current Time: {datetime.now().strftime('%H:%M:%S')}"
+
+    if msg.startswith("add"):
+        try:
+            _, a, b = msg.split()
+            return f"➕ Result = {float(a)+float(b)}"
+        except:
+            return "Usage: add 10 20"
+
+    if msg.startswith("subtract"):
+        try:
+            _, a, b = msg.split()
+            return f"➖ Result = {float(a)-float(b)}"
+        except:
+            return "Usage: subtract 20 10"
+
+    if msg.startswith("multiply"):
+        try:
+            _, a, b = msg.split()
+            return f"✖️ Result = {float(a)*float(b)}"
+        except:
+            return "Usage: multiply 5 6"
+
+    if msg.startswith("divide"):
+        try:
+            _, a, b = msg.split()
+
+            if float(b) == 0:
+                return "❌ Cannot divide by zero."
+
+            return f"➗ Result = {float(a)/float(b)}"
+        except:
+            return "Usage: divide 20 4"
+
+    return responses.get(
+        msg,
+        "🤖 Sorry, I don't understand that."
+    )
+
+# ==========================
+# SEND MESSAGE
+# ==========================
+
+def send_message(event=None):
+
+    message = entry.get().strip()
+
+    if not message:
+        return
+
+    chat_box.config(state=NORMAL)
+
+    chat_box.insert(
+        END,
+        f"\n🧑 You:\n{message}\n\n",
+        "user"
+    )
+
+    response = get_response(message)
+
+    chat_box.insert(
+        END,
+        f"🤖 SmartBot:\n{response}\n\n",
+        "bot"
+    )
+
+    chat_box.config(state=DISABLED)
+
+    chat_box.see(END)
+
+    entry.delete(0, END)
+
+# ==========================
+# MAIN WINDOW
+# ==========================
+
+root = Tk()
+root.title("SmartBot AI Assistant")
+root.geometry("1000x700")
+root.configure(bg=BG)
+
+# ==========================
+# HEADER
+# ==========================
+
+header = Frame(root, bg=HEADER, height=70)
+header.pack(fill=X)
+
+Label(
+    header,
+    text="🤖 SmartBot AI Assistant",
+    bg=HEADER,
+    fg="white",
+    font=("Segoe UI", 20, "bold")
+).pack(pady=18)
+
+# ==========================
+# CHAT AREA
+# ==========================
+
+chat_frame = Frame(root, bg=BG)
+chat_frame.pack(fill=BOTH, expand=True, padx=15, pady=15)
+
+scrollbar = Scrollbar(chat_frame)
+scrollbar.pack(side=RIGHT, fill=Y)
+
+chat_box = Text(
+    chat_frame,
+    bg="white",
+    fg="black",
+    font=("Segoe UI", 11),
+    wrap=WORD,
+    relief=FLAT,
+    padx=20,
+    pady=20,
+    yscrollcommand=scrollbar.set
+)
+
+chat_box.pack(fill=BOTH, expand=True)
+
+scrollbar.config(command=chat_box.yview)
+
+# User Style
+chat_box.tag_config(
+    "user",
+    background=USER_BUBBLE,
+    foreground=USER_TEXT,
+    spacing1=10,
+    spacing3=10,
+    lmargin1=300,
+    lmargin2=300
+)
+
+# Bot Style
+chat_box.tag_config(
+    "bot",
+    background=BOT_BUBBLE,
+    foreground=BOT_TEXT,
+    spacing1=10,
+    spacing3=10,
+    rmargin=250
+)
+
+chat_box.insert(
+    END,
+    "🤖 SmartBot:\nHello! How can I help you today?\n\n",
+    "bot"
+)
+
+chat_box.config(state=DISABLED)
+
+# ==========================
+# INPUT SECTION
+# ==========================
+
+bottom = Frame(root, bg=BG)
+bottom.pack(fill=X, padx=15, pady=10)
+
+entry = Entry(
+    bottom,
+    font=("Segoe UI", 12),
+    relief=FLAT,
+    bg="white"
+)
+
+entry.pack(
+    side=LEFT,
+    fill=X,
+    expand=True,
+    ipady=12
+)
+
+entry.bind("<Return>", send_message)
+
+send_btn = Button(
+    bottom,
+    text="➤ Send",
+    command=send_message,
+    bg="#10A37F",
+    fg="white",
+    relief=FLAT,
+    font=("Segoe UI", 11, "bold"),
+    padx=20,
+    pady=8,
+    cursor="hand2"
+)
+
+send_btn.pack(side=RIGHT, padx=10)
+
+# ==========================
+# FOOTER
+# ==========================
+
+Label(
+    root,
+    text="Developed by Zahid • DecodeLabs AI Internship 2026",
+    bg=BG,
+    fg="#6B7280",
+    font=("Segoe UI", 9)
+).pack(pady=5)
+
+# ==========================
+# START APP
+# ==========================
+
+root.mainloop()
